@@ -1,0 +1,35 @@
+button.itgg-button {
+  font-size: 2em;
+}
+
+.itgg-history-item-container {
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+
+.itgg-history-item {
+  display: inline-block;
+  border: 1px solid gray;
+  color: white;
+}
+
+.itgg-history-item-name {
+  font-size: large;
+}
+
+.itgg-history-item-name a {
+  color: black;
+}
+
+.itgg-history-item-stat {
+  font-size: large;
+}
+
+.itgg-correct {
+  background-color: #4f944f;
+}
+
+.itgg-incorrect {
+  background-color: #b97878;
+}
+

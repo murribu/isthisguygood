@@ -1,0 +1,4 @@
+node_modules/
+build/
+public/static/data/pitchers.json
+src/pitchers.json
