@@ -4,6 +4,7 @@ import s3deploy = require("@aws-cdk/aws-s3-deployment");
 import lambda = require("@aws-cdk/aws-lambda");
 import iam = require("@aws-cdk/aws-iam");
 import route53 = require("@aws-cdk/aws-route53");
+import route53Targets = require("@aws-cdk/aws-route53-targets");
 import events = require("@aws-cdk/aws-events");
 import eventsTargets = require("@aws-cdk/aws-events-targets");
 import { DnsValidatedCertificate } from "@aws-cdk/aws-certificatemanager";
@@ -76,23 +77,35 @@ export class CdkStack extends cdk.Stack {
       value: cdk.Fn.join(", ", nameServers)
     });
 
-    // const certificate = new DnsValidatedCertificate(this, "TestCertificate", {
-    //   domainName: "isthisguygood.gq",
-    //   hostedZone: hostedzone
-    // });
+    // I had to set up the hosted zone first
+    // Then register the domain (thru freenom)
+    // Then come back and put in the certificate stuff
 
-    // const distribution = new CloudFrontWebDistribution(this, "MyDistribution", {
-    //   originConfigs: [
-    //     {
-    //       s3OriginSource: {
-    //         s3BucketSource: websiteBucket
-    //       },
-    //       behaviors: [{ isDefaultBehavior: false }],
-    //       aliasConfiguration: {
-    //         acmCertRef: certificate.certificateArn
-    //       }
-    //     }
-    //   ]
-    // });
+    const certificate = new DnsValidatedCertificate(this, "TestCertificate", {
+      domainName: "isthisguygood.gq",
+      hostedZone: hostedzone
+    });
+
+    const distribution = new CloudFrontWebDistribution(this, "MyDistribution", {
+      originConfigs: [
+        {
+          s3OriginSource: {
+            s3BucketSource: websiteBucket
+          },
+          behaviors: [{ isDefaultBehavior: true }]
+        }
+      ],
+      aliasConfiguration: {
+        acmCertRef: certificate.certificateArn,
+        names: ["isthisguygood.gq"]
+      }
+    });
+
+    const cloudFrontTarget = new route53Targets.CloudFrontTarget(distribution);
+
+    const arecord = new route53.ARecord(this, "ARecord", {
+      target: route53.RecordTarget.fromAlias(cloudFrontTarget),
+      zone: hostedzone
+    });
   }
 }
