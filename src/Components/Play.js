@@ -283,7 +283,6 @@ export class Play extends React.Component {
     return (
       <div>
         <h1 className="mt-5 text-center">{this.displayPitcher()}</h1>
-        {this.filteredPitchers().length}
         {this.displayTeam()}
         {this.displayGoodAndBadButtons()}
         {this.showHistory()}
