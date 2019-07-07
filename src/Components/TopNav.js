@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Navbar, Nav } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { NavLink } from "react-router-dom";
@@ -16,6 +16,9 @@ class TopNav extends React.Component {
           <Nav className="mr-auto">
             <NavLink className="nav-link" to="/play">
               Play
+            </NavLink>
+            <NavLink className="nav-link" to="/settings">
+              Settings
             </NavLink>
             <NavLink className="nav-link" to="/about">
               About

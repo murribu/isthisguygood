@@ -6,10 +6,7 @@ import "./Play.css";
 export class Play extends React.Component {
   state = {
     pitcher: null,
-    show_team: false,
-    history: [],
-    pitchers: null,
-    loading: true
+    show_team: false
   };
 
   constructor(props) {
@@ -18,57 +15,20 @@ export class Play extends React.Component {
     this.selectPitcher = this.selectPitcher.bind(this);
     this.good = this.good.bind(this);
     this.bad = this.bad.bind(this);
-    this.clearHistory = this.clearHistory.bind(this);
   }
 
   componentDidMount() {
-    this.retrieveHistory();
-    this.loadPitchers();
-    setInterval(() => {
-      this.retrieveHistory();
-    }, 60000);
+    this.selectPitcher();
   }
 
-  loadPitchers() {
-    this.setState({ loading: true });
-    fetch("/static/data/pitchers.json")
-      .then(response => response.json())
-      .then(data => {
-        this.setState({ pitchers: data, loading: false });
-        this.selectPitcher();
-      })
-      .catch(() => {
-        console.log("Couldn't find any data!");
-      });
-  }
-
-  filteredPitchers() {
-    let self = this;
-    if (this.state.pitchers) {
-      return this.state.pitchers.stats_sortable_player.queryResults.row.filter(
-        p => {
-          return (
-            parseInt(p.g) / 2 > parseInt(p.gs) &&
-            (parseFloat(p.era) > 4.2 || parseFloat(p.era) < 3) &&
-            self.state.history.filter(h => {
-              return (
-                h.pitcher.player_id === p.player_id &&
-                moment(h.timestamp).format() >
-                  moment()
-                    .subtract({ hours: 24 })
-                    .format()
-              );
-            }).length === 0
-          );
-        }
-      );
-    } else {
-      return [];
+  componentDidUpdate(oldProps) {
+    if (oldProps.pitchers.length !== this.props.pitchers.length) {
+      this.selectPitcher();
     }
   }
 
   selectPitcher() {
-    const filteredPitchers = this.filteredPitchers();
+    const filteredPitchers = this.props.filteredPitchers();
     if (filteredPitchers.length > 0) {
       const pitcher =
         filteredPitchers[Math.floor(Math.random() * filteredPitchers.length)];
@@ -81,15 +41,23 @@ export class Play extends React.Component {
   displayPitcher() {
     if (this.state.pitcher) {
       return (
-        <div className="text-center">
-          {this.state.pitcher.name_display_first_last}
+        <div>
+          <h1 className="mt-5 text-center">
+            {this.state.pitcher.name_display_first_last}
+          </h1>
+          <h2 className="mt-2 text-center">Stat: {this.props.stat}</h2>
         </div>
       );
     } else {
       if (this.state.loading) {
-        return "loading...";
+        return <h1 className="mt-5 text-center">loading...</h1>;
       } else {
-        return "You've guessed all of 'em. Either clear your history or wait until tomorrow to try again.";
+        return (
+          <h1 className="mt-5 text-center">
+            You've guessed all of 'em. Either clear your history or wait until
+            tomorrow to try again.
+          </h1>
+        );
       }
     }
   }
@@ -146,37 +114,22 @@ export class Play extends React.Component {
   }
 
   good() {
-    this.addToHistory(this.state.pitcher, "good");
+    this.props.addToHistory(this.state.pitcher, "good");
+    process.nextTick(() => {
+      this.selectPitcher();
+    });
   }
 
   bad() {
-    this.addToHistory(this.state.pitcher, "bad");
-  }
-
-  retrieveHistory() {
-    const history = localStorage.getItem("history") || "[]";
-    this.setState({ history: JSON.parse(history) });
-  }
-
-  addToHistory(pitcher, good_bad) {
-    let history = localStorage.getItem("history");
-    let history_arr = [];
-    if (history) {
-      history_arr = JSON.parse(history);
-    }
-    history_arr.push({ pitcher, good_bad, timestamp: moment().format() });
-    this.setState({ history: history_arr });
-    history = JSON.stringify(history_arr);
-    localStorage.setItem("history", history);
-    this.retrieveHistory();
+    this.props.addToHistory(this.state.pitcher, "bad");
     process.nextTick(() => {
       this.selectPitcher();
     });
   }
 
   showHistory() {
-    if (this.state.history) {
-      const reverse_history = this.state.history.sort((a, b) => {
+    if (this.props.history) {
+      const reverse_history = this.props.history.sort((a, b) => {
         return a.timestamp < b.timestamp ? 1 : -1;
       });
       const score = this.score();
@@ -192,8 +145,8 @@ export class Play extends React.Component {
                 Math.round(score.percentage * 100) +
                 "%)"}
             </h2>
-            {this.state.history.length > 0 ? (
-              <Button onClick={this.clearHistory} className="ml-2 mb-2">
+            {this.props.history.length > 0 ? (
+              <Button onClick={this.props.clearHistory} className="ml-2 mb-2">
                 Clear
               </Button>
             ) : (
@@ -201,40 +154,48 @@ export class Play extends React.Component {
             )}
           </div>
           <div className="itgg-history-item-container">
-            {Object.keys(reverse_history).map(key => (
-              <div
-                className={
-                  "itgg-history-item text-center p-2 " +
-                  (this.correct(
-                    reverse_history[key].pitcher.era,
-                    reverse_history[key].good_bad
-                  )
-                    ? "itgg-correct"
-                    : "itgg-incorrect")
-                }
-                key={key}
-              >
-                <div className="itgg-history-item-name">
-                  <a
-                    href={
-                      "http://mlb.mlb.com/team/player.jsp?player_id=" +
-                      reverse_history[key].pitcher.player_id
-                    }
-                    target="_new"
-                  >
-                    {reverse_history[key].pitcher.name_display_first_last}
-                  </a>
+            {Object.keys(reverse_history).map(key => {
+              const stat = reverse_history[key].stat || "era";
+              const upperlimit = reverse_history[key].upperlimit || 4.2;
+              const lowerlimit = reverse_history[key].lowerlimit || 3;
+              return (
+                <div
+                  className={
+                    "itgg-history-item text-center p-2 " +
+                    (this.props.correct(reverse_history[key])
+                      ? "itgg-correct"
+                      : "itgg-incorrect")
+                  }
+                  key={key}
+                >
+                  <div className="itgg-history-item-name">
+                    <a
+                      href={
+                        "http://mlb.mlb.com/team/player.jsp?player_id=" +
+                        reverse_history[key].pitcher.player_id
+                      }
+                      target="_new"
+                    >
+                      {reverse_history[key].pitcher.name_display_first_last}
+                    </a>
+                  </div>
+                  <div className="itgg-history-item-name">
+                    {reverse_history[key].pitcher.team_name}
+                  </div>
+                  <div className="itgg-history-item-stat">
+                    {reverse_history[key].pitcher[stat]} {stat}
+                  </div>
+                  <div>You said {reverse_history[key].good_bad}</div>
+                  <div>{moment(reverse_history[key].timestamp).fromNow()}</div>
+                  <div className="itgg-history-item-lowerlimit">
+                    {lowerlimit}
+                  </div>
+                  <div className="itgg-history-item-upperlimit">
+                    {upperlimit}
+                  </div>
                 </div>
-                <div className="itgg-history-item-name">
-                  {reverse_history[key].pitcher.team_name}
-                </div>
-                <div className="itgg-history-item-stat">
-                  {reverse_history[key].pitcher.era}
-                </div>
-                <div>You said {reverse_history[key].good_bad}</div>
-                <div>{moment(reverse_history[key].timestamp).fromNow()}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       );
@@ -243,21 +204,11 @@ export class Play extends React.Component {
     }
   }
 
-  clearHistory() {
-    localStorage.setItem("history", "[]");
-    this.setState({ history: [] });
-    this.retrieveHistory();
-    process.nextTick(() => {
-      this.selectPitcher();
-    });
-  }
-
   score() {
-    if (this.state.history) {
-      const correct = this.state.history.filter(h =>
-        this.correct(h.pitcher.era, h.good_bad)
-      ).length;
-      const total = this.state.history.length;
+    if (this.props.history) {
+      const correct = this.props.history.filter(h => this.props.correct(h))
+        .length;
+      const total = this.props.history.length;
       return {
         correct,
         total,
@@ -268,13 +219,6 @@ export class Play extends React.Component {
     }
   }
 
-  correct(era, good_bad) {
-    return (
-      (parseFloat(era) < 3.0 && good_bad === "good") ||
-      (parseFloat(era) > 4.2 && good_bad === "bad")
-    );
-  }
-
   toggleShowTeam() {
     this.setState({ show_team: !this.state.show_team });
   }
@@ -282,7 +226,7 @@ export class Play extends React.Component {
   render() {
     return (
       <div>
-        <h1 className="mt-5 text-center">{this.displayPitcher()}</h1>
+        {this.displayPitcher()}
         {this.displayTeam()}
         {this.displayGoodAndBadButtons()}
         {this.showHistory()}

@@ -11,6 +11,8 @@ button.itgg-button {
   display: inline-block;
   border: 1px solid gray;
   color: white;
+  position: relative;
+  height: 10em;
 }
 
 .itgg-history-item-name {
@@ -25,6 +27,17 @@ button.itgg-button {
   font-size: large;
 }
 
+.itgg-history-item-lowerlimit {
+  position: absolute;
+  bottom: 0;
+}
+
+.itgg-history-item-upperlimit {
+  position: absolute;
+  bottom: 0;
+  right: 0.5em;
+}
+
 .itgg-correct {
   background-color: #4f944f;
 }
@@ -32,4 +45,3 @@ button.itgg-button {
 .itgg-incorrect {
   background-color: #b97878;
 }
-
