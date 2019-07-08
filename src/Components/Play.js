@@ -74,7 +74,7 @@ export class Play extends React.Component {
         return (
           <div className="text-center">
             <Button
-              className="m-4 p-4 itgg-button"
+              className="m-3 p-4 itgg-button"
               onClick={this.toggleShowTeam}
             >
               Show His Team
