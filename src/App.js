@@ -78,7 +78,12 @@ export class App extends React.Component {
       history_arr = JSON.parse(history);
     }
     history_arr.push({
-      pitcher: { ...pitcher, player_id: pitcher.playerId },
+      pitcher: {
+        ...pitcher,
+        player_id: pitcher.playerId,
+        name_display_first_last: pitcher.playerFullName,
+        team_name: pitcher.teamShortName
+      },
       good_bad,
       lowerlimit: this.state.lowerlimit,
       upperlimit: this.state.upperlimit,
