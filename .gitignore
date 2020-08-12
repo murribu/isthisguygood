@@ -1,6 +1,4 @@
 node_modules/
 build/
-public/static/data/pitchers.json
-public/static/data/pitchers.2019.json
-src/pitchers.json
-src/pitchers.2019.json
+public/static/data/pitchers.*.json
+src/pitchers.*.json

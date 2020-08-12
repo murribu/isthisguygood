@@ -99,7 +99,7 @@ export class App extends React.Component {
 
   loadPitchers() {
     this.setState({ loading: true });
-    fetch("/static/data/pitchers.json")
+    fetch("/static/data/pitchers.2020.json")
       .then(response => response.json())
       .then(data => {
         this.setState({
