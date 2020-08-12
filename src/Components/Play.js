@@ -43,7 +43,7 @@ export class Play extends React.Component {
       return (
         <div>
           <h1 className="mt-5 text-center">
-            {this.state.pitcher.name_display_first_last}
+            {this.state.pitcher.playerFullName}
           </h1>
           <h2 className="mt-2 text-center">Stat: {this.props.stat}</h2>
         </div>
@@ -67,7 +67,7 @@ export class Play extends React.Component {
       if (this.state.show_team) {
         return (
           <h2 className="m-4 p-4 text-center">
-            {this.state.pitcher.team_name}
+            {this.state.pitcher.teamShortName}
           </h2>
         );
       } else {

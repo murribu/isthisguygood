@@ -17,7 +17,7 @@ export class App extends React.Component {
     availablestats: {
       era: { order: "desc", lowerlimit: 3, upperlimit: 4.2 },
       whip: { order: "desc", lowerlimit: 1.2, upperlimit: 1.5 },
-      k_9: { order: "asc", lowerlimit: 8, upperlimit: 10 }
+      strikeoutsPer9: { order: "asc", lowerlimit: 8, upperlimit: 10 }
     },
     history: []
   };
@@ -78,7 +78,7 @@ export class App extends React.Component {
       history_arr = JSON.parse(history);
     }
     history_arr.push({
-      pitcher,
+      pitcher: { ...pitcher, player_id: pitcher.playerId },
       good_bad,
       lowerlimit: this.state.lowerlimit,
       upperlimit: this.state.upperlimit,
@@ -103,12 +103,12 @@ export class App extends React.Component {
       .then(response => response.json())
       .then(data => {
         this.setState({
-          pitchers: data.stats_sortable_player.queryResults.row,
+          pitchers: data.stats,
           loading: false
         });
-        this.selectPitcher();
       })
-      .catch(() => {
+      .catch(err => {
+        console.error(err);
         console.log("Couldn't find any data!");
       });
   }
@@ -118,18 +118,17 @@ export class App extends React.Component {
     if (this.state.pitchers) {
       return this.state.pitchers.filter(p => {
         return (
-          (!this.state.relievers || parseInt(p.g) / 2 > parseInt(p.gs)) &&
-          parseFloat(p.ip) > parseFloat(this.state.iplimit) &&
+          (!this.state.relievers ||
+            parseInt(p.gamesPlayed) / 2 > parseInt(p.gamesStarted)) &&
+          parseFloat(p.inningsPitched) > parseFloat(this.state.iplimit) &&
           (parseFloat(p[this.state.stat]) > parseFloat(this.state.upperlimit) ||
             parseFloat(p[this.state.stat]) <
               parseFloat(this.state.lowerlimit)) &&
           self.state.history.filter(h => {
             return (
-              h.pitcher.player_id === p.player_id &&
+              h.pitcher.player_id === p.playerId &&
               moment(h.timestamp).format() >
-                moment()
-                  .subtract({ hours: 18 })
-                  .format()
+                moment().subtract({ hours: 18 }).format()
             );
           }).length === 0
         );

@@ -20,7 +20,7 @@ export class CdkStack extends cdk.Stack {
     });
 
     new s3deploy.BucketDeployment(this, "DeployWebsite", {
-      source: s3deploy.Source.asset("../build"),
+      sources: [s3deploy.Source.asset("../build")],
       destinationBucket: websiteBucket
     });
 
@@ -32,7 +32,8 @@ export class CdkStack extends cdk.Stack {
         source_bucket: "pagedumps",
         source_key: "mlb/teams/pitchers.json",
         destination_bucket: websiteBucket.bucketName
-      }
+      },
+      timeout: cdk.Duration.minutes(5)
     });
 
     const fnTarget = new eventsTargets.LambdaFunction(fn);
@@ -42,7 +43,7 @@ export class CdkStack extends cdk.Stack {
       hour: "12",
       minute: "5",
       month: "2-10",
-      year: "2019"
+      year: "2020"
     });
 
     const rule = new events.Rule(this, "ruleCopyStatsForIsThisGuyGood", {
