@@ -55,7 +55,7 @@ export class CdkStack extends cdk.Stack {
 
     let sourceBucketPolicyStatement = new iam.PolicyStatement();
     sourceBucketPolicyStatement.addResources(
-      "arn:aws:s3:::pagedumps/mlb/teams/pitchers.json"
+      "arn:aws:s3:::pagedumps/mlb/teams/pitchers*"
     );
     sourceBucketPolicyStatement.addActions("s3:getObject");
 
