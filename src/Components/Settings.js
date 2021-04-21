@@ -34,16 +34,18 @@ export class Settings extends React.Component {
   showStats() {
     const pitchers = this.props.pitchers.filter(p => {
       return (
-        (!this.props.relievers || parseInt(p.g) / 2 > parseInt(p.gs)) &&
-        parseFloat(p.ip) > parseFloat(this.props.iplimit) &&
+        (!this.props.relievers ||
+          parseInt(p.gamesPlayed) / 2 > parseInt(p.gamesStarted)) &&
+        parseFloat(p.inningsPitched) > parseFloat(this.props.iplimit) &&
         (parseFloat(p[this.props.stat]) > parseFloat(this.props.upperlimit) ||
           parseFloat(p[this.props.stat]) < parseFloat(this.props.lowerlimit))
       );
     });
     const good = this.props.pitchers.filter(p => {
       return (
-        (!this.props.relievers || parseInt(p.g) / 2 > parseInt(p.gs)) &&
-        parseFloat(p.ip) > parseFloat(this.props.iplimit) &&
+        (!this.props.relievers ||
+          parseInt(p.gamesPlayed) / 2 > parseInt(p.gamesStarted)) &&
+        parseFloat(p.inningsPitched) > parseFloat(this.props.iplimit) &&
         ((this.props.order === "asc" &&
           parseFloat(p[this.props.stat]) > parseFloat(this.props.upperlimit)) ||
           (this.props.order === "desc" &&
@@ -53,7 +55,7 @@ export class Settings extends React.Component {
     return (
       (pitchers.length === 0
         ? 0
-        : Math.round((100 * good.length) / pitchers.length)) +
+        : Math.round(100 * good.length / pitchers.length)) +
       "% of the " +
       pitchers.length +
       " pitchers would be good"

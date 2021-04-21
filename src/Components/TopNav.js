@@ -24,6 +24,9 @@ class TopNav extends React.Component {
               About
             </NavLink>
           </Nav>
+          <Nav className="justify-content-end mr-3" style={{ width: "100%" }}>
+            2021
+          </Nav>
         </Navbar.Collapse>
       </Navbar>
     );

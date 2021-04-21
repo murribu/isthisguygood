@@ -18,9 +18,16 @@ export class Home extends React.Component {
         </p>
         <h2>Setup:</h2>
         <ol>
-          <li>This system has every reliever's stats as of this morning.</li>
           <li>
-            Everyone who has an ERA between 3.00 and 4.20 has been removed.
+            This system has every <b>reliever's</b> stats as of this morning.
+          </li>
+          <li>
+            Everyone who has an <b>ERA</b> between <b>3.00</b> and <b>4.20</b>{" "}
+            has been removed.
+          </li>
+          <li>
+            Everything in <b>Bold</b> can be changed on the{" "}
+            <NavLink to="/settings">Settings</NavLink> page.
           </li>
           <li>
             "Reliever" is defined as someone who has pitched in at least one

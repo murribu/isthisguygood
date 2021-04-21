@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "cdk-deploy": "./exports.sh",
+    "deploy": "./exports.sh",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "start": "PORT=3333 react-scripts start",
@@ -22,7 +23,11 @@
     "react-scripts": "^3.0.1"
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",

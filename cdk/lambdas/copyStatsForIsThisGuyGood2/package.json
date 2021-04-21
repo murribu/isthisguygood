@@ -1,0 +1,12 @@
+{
+  "name": "copyStatsForIsThisGuyGood2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0"
+  }
+}

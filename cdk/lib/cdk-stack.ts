@@ -16,24 +16,24 @@ export class CdkStack extends cdk.Stack {
 
     const websiteBucket = new s3.Bucket(this, "WebsiteBucket", {
       websiteIndexDocument: "index.html",
-      publicReadAccess: true
+      publicReadAccess: true,
     });
 
     new s3deploy.BucketDeployment(this, "DeployWebsite", {
       sources: [s3deploy.Source.asset("../build")],
-      destinationBucket: websiteBucket
+      destinationBucket: websiteBucket,
     });
 
     const fn = new lambda.Function(this, "copyStatsForIsThisGuyGood", {
-      runtime: lambda.Runtime.PYTHON_3_6,
-      handler: "lambda_function.lambda_handler",
-      code: lambda.Code.asset("./lambdas/copyStatsForIsThisGuyGood"),
+      runtime: lambda.Runtime.NODEJS_12_X,
+      handler: "index.handler",
+      code: lambda.Code.asset("./lambdas/copyStatsForIsThisGuyGood2"),
       environment: {
         source_bucket: "pagedumps",
         source_key: "mlb/teams/pitchers.json",
-        destination_bucket: websiteBucket.bucketName
+        destination_bucket: websiteBucket.bucketName,
       },
-      timeout: cdk.Duration.minutes(5)
+      timeout: cdk.Duration.minutes(5),
     });
 
     const fnTarget = new eventsTargets.LambdaFunction(fn);
@@ -43,14 +43,14 @@ export class CdkStack extends cdk.Stack {
       hour: "12",
       minute: "5",
       month: "2-10",
-      year: "2020"
+      year: "2021",
     });
 
     const rule = new events.Rule(this, "ruleCopyStatsForIsThisGuyGood", {
       enabled: true,
       schedule: schedule,
       targets: [fnTarget],
-      ruleName: "ruleCopyStatsForIsThisGuyGood"
+      ruleName: "ruleCopyStatsForIsThisGuyGood",
     });
 
     let sourceBucketPolicyStatement = new iam.PolicyStatement();
@@ -69,13 +69,13 @@ export class CdkStack extends cdk.Stack {
     fn.addToRolePolicy(destinationBucketPolicyStatement);
 
     const hostedzone = new route53.PublicHostedZone(this, "HostedZone", {
-      zoneName: "isthisguygood.gq"
+      zoneName: "isthisguygood.gq",
     });
 
     const nameServers = hostedzone.hostedZoneNameServers || [];
     new cdk.CfnOutput(this, "NameServers", {
       description: "NameServers",
-      value: cdk.Fn.join(", ", nameServers)
+      value: cdk.Fn.join(", ", nameServers),
     });
 
     // I had to set up the hosted zone first
@@ -84,29 +84,29 @@ export class CdkStack extends cdk.Stack {
 
     const certificate = new DnsValidatedCertificate(this, "TestCertificate", {
       domainName: "isthisguygood.gq",
-      hostedZone: hostedzone
+      hostedZone: hostedzone,
     });
 
     const distribution = new CloudFrontWebDistribution(this, "MyDistribution", {
       originConfigs: [
         {
           s3OriginSource: {
-            s3BucketSource: websiteBucket
+            s3BucketSource: websiteBucket,
           },
-          behaviors: [{ isDefaultBehavior: true }]
-        }
+          behaviors: [{ isDefaultBehavior: true }],
+        },
       ],
       aliasConfiguration: {
         acmCertRef: certificate.certificateArn,
-        names: ["isthisguygood.gq"]
-      }
+        names: ["isthisguygood.gq"],
+      },
     });
 
     const cloudFrontTarget = new route53Targets.CloudFrontTarget(distribution);
 
     const arecord = new route53.ARecord(this, "ARecord", {
       target: route53.RecordTarget.fromAlias(cloudFrontTarget),
-      zone: hostedzone
+      zone: hostedzone,
     });
   }
 }

@@ -17,9 +17,9 @@ export class App extends React.Component {
     availablestats: {
       era: { order: "desc", lowerlimit: 3, upperlimit: 4.2 },
       whip: { order: "desc", lowerlimit: 1.2, upperlimit: 1.5 },
-      strikeoutsPer9: { order: "asc", lowerlimit: 8, upperlimit: 10 }
+      strikeoutsPer9: { order: "asc", lowerlimit: 8, upperlimit: 10 },
     },
-    history: []
+    history: [],
   };
 
   constructor(props) {
@@ -40,14 +40,14 @@ export class App extends React.Component {
       "upperlimit",
       "iplimit",
       "relievers",
-      "order"
+      "order",
     ];
     for (var settingIdx = 0; settingIdx < settingsToLoad.length; settingIdx++) {
       if (localStorage.getItem(settingsToLoad[settingIdx])) {
         this.setState({
           [settingsToLoad[settingIdx]]: localStorage.getItem(
             settingsToLoad[settingIdx]
-          )
+          ),
         });
       }
     }
@@ -82,14 +82,14 @@ export class App extends React.Component {
         ...pitcher,
         player_id: pitcher.playerId,
         name_display_first_last: pitcher.playerFullName,
-        team_name: pitcher.teamShortName
+        team_name: pitcher.teamShortName,
       },
       good_bad,
       lowerlimit: this.state.lowerlimit,
       upperlimit: this.state.upperlimit,
       stat: this.state.stat,
       order: this.state.order,
-      timestamp: moment().format()
+      timestamp: moment().format(),
     });
     this.setState({ history: history_arr });
     history = JSON.stringify(history_arr);
@@ -104,12 +104,12 @@ export class App extends React.Component {
 
   loadPitchers() {
     this.setState({ loading: true });
-    fetch("/static/data/pitchers.2020.json")
+    fetch("/static/data/pitchers.2021.json")
       .then(response => response.json())
       .then(data => {
         this.setState({
           pitchers: data.stats,
-          loading: false
+          loading: false,
         });
       })
       .catch(err => {
