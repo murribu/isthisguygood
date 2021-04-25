@@ -3,49 +3,47 @@ import { Button } from "react-bootstrap";
 import moment from "moment";
 import "./Play.css";
 
-export class Play extends React.Component {
+export class Hitters extends React.Component {
   state = {
-    pitcher: null,
+    hitter: null,
     show_team: false,
   };
-
   constructor(props) {
     super(props);
     this.toggleShowTeam = this.toggleShowTeam.bind(this);
-    this.selectPitcher = this.selectPitcher.bind(this);
+    this.selectHitter = this.selectHitter.bind(this);
     this.good = this.good.bind(this);
     this.bad = this.bad.bind(this);
   }
 
   componentDidMount() {
-    this.selectPitcher();
+    this.selectHitter();
   }
 
   componentDidUpdate(oldProps) {
-    if (oldProps.pitchers.length !== this.props.pitchers.length) {
-      this.selectPitcher();
+    if (oldProps.hitters.length !== this.props.hitters.length) {
+      this.selectHitter();
     }
   }
 
-  selectPitcher() {
-    const filteredPitchers = this.props.filteredPitchers();
-    if (filteredPitchers.length > 0) {
-      const pitcher =
-        filteredPitchers[Math.floor(Math.random() * filteredPitchers.length)];
-      this.setState({ show_team: false, pitcher });
+  selectHitter() {
+    const filteredHitters = this.props.filteredHitters();
+    if (filteredHitters.length > 0) {
+      const hitter =
+        filteredHitters[Math.floor(Math.random() * filteredHitters.length)];
+      this.setState({ show_team: false, hitter });
     } else {
-      this.setState({ pitcher: null });
+      this.setState({ hitter: null });
     }
   }
-
-  displayPitcher() {
-    if (this.state.pitcher) {
+  displayHitter() {
+    if (this.state.hitter) {
       return (
         <div>
           <h1 className="mt-5 text-center">
-            {this.state.pitcher.playerFullName}
+            {this.state.hitter.playerFullName}
           </h1>
-          <h2 className="mt-2 text-center">Stat: {this.props.pitcherstat}</h2>
+          <h2 className="mt-2 text-center">Stat: {this.props.hitterstat}</h2>
         </div>
       );
     } else {
@@ -63,11 +61,11 @@ export class Play extends React.Component {
   }
 
   displayTeam() {
-    if (this.state.pitcher) {
+    if (this.state.hitter) {
       if (this.state.show_team) {
         return (
           <h2 className="m-4 p-4 text-center">
-            {this.state.pitcher.teamShortName}
+            {this.state.hitter.teamShortName}
           </h2>
         );
       } else {
@@ -86,9 +84,8 @@ export class Play extends React.Component {
       return "";
     }
   }
-
   displayGoodAndBadButtons() {
-    if (this.state.pitcher) {
+    if (this.state.hitter) {
       return (
         <div className="text-center">
           <Button
@@ -102,7 +99,7 @@ export class Play extends React.Component {
           </Button>
           <Button
             className="m-4 p-4 btn-warning itgg-button"
-            onClick={this.selectPitcher}
+            onClick={this.selectHitter}
           >
             Skip
           </Button>
@@ -114,22 +111,22 @@ export class Play extends React.Component {
   }
 
   good() {
-    this.props.addToPitcherHistory(this.state.pitcher, "good");
+    this.props.addToHitterHistory(this.state.hitter, "good");
     process.nextTick(() => {
-      this.selectPitcher();
+      this.selectHitter();
     });
   }
 
   bad() {
-    this.props.addToPitcherHistory(this.state.pitcher, "bad");
+    this.props.addToHitterHistory(this.state.hitter, "bad");
     process.nextTick(() => {
-      this.selectPitcher();
+      this.selectHitter();
     });
   }
 
   showHistory() {
-    if (this.props.pitcherhistory) {
-      const reverse_history = this.props.pitcherhistory.sort((a, b) => {
+    if (this.props.hitterhistory) {
+      const reverse_history = this.props.hitterhistory.sort((a, b) => {
         return a.timestamp < b.timestamp ? 1 : -1;
       });
       const score = this.score();
@@ -145,9 +142,9 @@ export class Play extends React.Component {
                 Math.round(score.percentage * 100) +
                 "%)"}
             </h2>
-            {this.props.pitcherhistory.length > 0 ? (
+            {this.props.hitterhistory.length > 0 ? (
               <Button
-                onClick={this.props.clearPitcherHistory}
+                onClick={this.props.clearHitterHistory}
                 className="ml-2 mb-2"
               >
                 Clear
@@ -158,7 +155,7 @@ export class Play extends React.Component {
           </div>
           <div className="itgg-history-item-container">
             {Object.keys(reverse_history).map(key => {
-              const stat = reverse_history[key].stat || "era";
+              const stat = reverse_history[key].stat || "avg";
               const upperlimit = reverse_history[key].upperlimit || 4.2;
               const lowerlimit = reverse_history[key].lowerlimit || 3;
               return (
@@ -175,18 +172,18 @@ export class Play extends React.Component {
                     <a
                       href={
                         "http://mlb.mlb.com/team/player.jsp?player_id=" +
-                        reverse_history[key].pitcher.player_id
+                        reverse_history[key].hitter.player_id
                       }
                       target="_new"
                     >
-                      {reverse_history[key].pitcher.name_display_first_last}
+                      {reverse_history[key].hitter.name_display_first_last}
                     </a>
                   </div>
                   <div className="itgg-history-item-name">
-                    {reverse_history[key].pitcher.team_name}
+                    {reverse_history[key].hitter.team_name}
                   </div>
                   <div className="itgg-history-item-stat">
-                    {reverse_history[key].pitcher[stat]} {stat}
+                    {reverse_history[key].hitter[stat]} {stat}
                   </div>
                   <div>You said {reverse_history[key].good_bad}</div>
                   <div>{moment(reverse_history[key].timestamp).fromNow()}</div>
@@ -208,11 +205,11 @@ export class Play extends React.Component {
   }
 
   score() {
-    if (this.props.pitcherhistory) {
-      const correct = this.props.pitcherhistory.filter(h =>
+    if (this.props.hitterhistory) {
+      const correct = this.props.hitterhistory.filter(h =>
         this.props.correct(h)
       ).length;
-      const total = this.props.pitcherhistory.length;
+      const total = this.props.hitterhistory.length;
       return {
         correct,
         total,
@@ -228,9 +225,10 @@ export class Play extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     return (
       <div>
-        {this.displayPitcher()}
+        {this.displayHitter()}
         {this.displayTeam()}
         {this.displayGoodAndBadButtons()}
         {this.showHistory()}
@@ -239,4 +237,4 @@ export class Play extends React.Component {
   }
 }
 
-export default Play;
+export default Hitters;

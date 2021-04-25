@@ -4,12 +4,18 @@ import Home from "./Home";
 import Play from "./Play";
 import About from "./About";
 import Settings from "./Settings";
+import Hitters from "./Hitters";
 
 const Routes = ({ childProps }) => (
   <Switch>
     <Route exact path="/" component={Home} />
     <Route exact path="/about" component={About} />
     <Route exact path="/play" render={props => <Play {...childProps} />} />
+    <Route
+      exact
+      path="/hitters"
+      render={props => <Hitters {...childProps} />}
+    />
     <Route
       exact
       path="/settings"

@@ -15,7 +15,10 @@ class TopNav extends React.Component {
         <Navbar.Collapse>
           <Nav className="mr-auto">
             <NavLink className="nav-link" to="/play">
-              Play
+              Pitchers
+            </NavLink>
+            <NavLink className="nav-link" to="/hitters">
+              Hitters
             </NavLink>
             <NavLink className="nav-link" to="/settings">
               Settings

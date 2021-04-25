@@ -1,4 +1,6 @@
 node_modules/
 build/
 public/static/data/pitchers.*.json
+public/static/data/hitters.*.json
 src/pitchers.*.json
+src/hitters.*.json
